@@ -4,9 +4,9 @@ namespace Marketplace.Dal.Repositories;
 
 public interface IProductVariationRepository
 {
-    Task<ProductVariation> AddAsync(ProductVariation product);
+    Task AddAsync(ProductVariation product);
     Task<ProductVariation> GetAsync(string id);
-    Task<ProductVariation> RemoveAsync(string product);
+    Task<bool> RemoveAsync(string id);
     Task<IEnumerable<ProductVariation>> GetAllAsync();
-    Task<ProductVariation> UpdateAsync(ProductVariation product);
+    Task<bool> UpdateAsync(ProductVariation product);
 }

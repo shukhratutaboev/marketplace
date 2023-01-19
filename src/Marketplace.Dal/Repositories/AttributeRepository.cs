@@ -1,31 +1,49 @@
+using Marketplace.Dal.Data;
+using Microsoft.EntityFrameworkCore;
 using Attribute = Marketplace.Domain.Entities.TableModels.Attribute;
 
 namespace Marketplace.Dal.Repositories;
 
 public class AttributeRepository : IAttributeRepository
 {
-    public Task<Attribute> AddAsync(Attribute attribute)
+    private readonly MarketplaceDbContext _context;
+
+    public AttributeRepository(MarketplaceDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    public async Task<Attribute> AddAsync(Attribute attribute)
+    {
+        var entity = await _context.Attributes.AddAsync(attribute);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<IEnumerable<Attribute>> GetAllAsync()
+    public async Task<IEnumerable<Attribute>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Attributes.ToListAsync();
     }
 
-    public Task<Attribute> GetAsync(long id)
+    public async Task<Attribute> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        return await _context.Attributes.FirstOrDefaultAsync(a => a.Id == id);
     }
 
-    public Task<Attribute> RemoveAsync(long id)
+    public async Task<Attribute> RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        var attribute = await GetAsync(id);
+        var entity = _context.Remove(attribute);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<Attribute> UpdateAsync(Attribute attribute)
+    public async Task<Attribute> UpdateAsync(Attribute attribute)
     {
-        throw new NotImplementedException();
+        var entity = _context.Attributes.Update(attribute);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 }

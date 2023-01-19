@@ -1,31 +1,49 @@
+using Marketplace.Dal.Data;
 using Marketplace.Domain.Entities.TableModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.Dal.Repositories;
 
 public class BrandRepository : IBrandRepository
 {
-    public Task<Brand> AddAsync(Brand brand)
+    private readonly MarketplaceDbContext _context;
+
+    public BrandRepository(MarketplaceDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    public async Task<Brand> AddAsync(Brand brand)
+    {
+        var entity = await _context.Brands.AddAsync(brand);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<IEnumerable<Brand>> GetAllAsync()
+    public async Task<IEnumerable<Brand>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Brands.ToListAsync();
     }
 
-    public Task<Brand> GetAsync(long brand)
+    public async Task<Brand> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        return await _context.Brands.FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public Task<Brand> RemoveAsync(long id)
+    public async Task<Brand> RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        var brand = await GetAsync(id);
+        var entity = _context.Remove(brand);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<Brand> UpdateAsync(Brand brand)
+    public async Task<Brand> UpdateAsync(Brand brand)
     {
-        throw new NotImplementedException();
+        var entity = _context.Brands.Update(brand);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 }

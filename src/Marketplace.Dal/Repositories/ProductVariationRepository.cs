@@ -1,31 +1,47 @@
+using Marketplace.Dal.Data;
 using Marketplace.Domain.Entities.MongoModels;
+using MongoDB.Driver;
 
 namespace Marketplace.Dal.Repositories;
 
 public class ProductVariationRepository : IProductVariationRepository
 {
-    public Task<ProductVariation> AddAsync(ProductVariation product)
+    private readonly MongoDbContext _context;
+
+    public ProductVariationRepository(MongoDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    public async Task AddAsync(ProductVariation product)
+    {
+        await _context.Products.InsertOneAsync(product);
     }
 
-    public Task<IEnumerable<ProductVariation>> GetAllAsync()
+    public async Task<IEnumerable<ProductVariation>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        var products = await _context.Products.FindAsync(p => true);
+
+        return await products.ToListAsync();
     }
 
-    public Task<ProductVariation> GetAsync(string id)
+    public async Task<ProductVariation> GetAsync(string id)
     {
-        throw new NotImplementedException();
+        var product = await _context.Products.FindAsync(p => p.Id == id);
+
+        return await product.FirstOrDefaultAsync();
     }
 
-    public Task<ProductVariation> RemoveAsync(string product)
+    public async Task<bool> RemoveAsync(string id)  
     {
-        throw new NotImplementedException();
+        var result = await _context.Products.DeleteOneAsync(p => p.Id == id);
+
+        return result.IsAcknowledged && result.DeletedCount > 0;
     }
 
-    public Task<ProductVariation> UpdateAsync(ProductVariation product)
+    public async Task<bool> UpdateAsync(ProductVariation product)
     {
-        throw new NotImplementedException();
+        var result = await _context.Products.ReplaceOneAsync(p => p.Id == product.Id, product);
+
+        return result.IsAcknowledged && result.ModifiedCount > 0;
     }
 }

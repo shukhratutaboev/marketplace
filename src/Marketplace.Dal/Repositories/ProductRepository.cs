@@ -1,31 +1,49 @@
+using Marketplace.Dal.Data;
 using Marketplace.Domain.Entities.TableModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.Dal.Repositories;
 
 public class ProductRepository : IProductRepository
 {
-    public Task<Product> AddAsync(Product product)
+    private readonly MarketplaceDbContext _context;
+
+    public ProductRepository(MarketplaceDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    public async Task<Product> AddAsync(Product product)
+    {
+        var entity = await _context.Products.AddAsync(product);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<IEnumerable<Product>> GetAllAsync()
+    public async Task<IEnumerable<Product>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Products.ToListAsync();
     }
 
-    public Task<Product> GetAsync(long id)
+    public async Task<Product> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        return await _context.Products.FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public Task<Product> RemoveAsync(long id)
+    public async Task<Product> RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        var product = await GetAsync(id);
+        var entity = _context.Products.Remove(product);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<Product> UpdateAsync(Product product)
+    public async Task<Product> UpdateAsync(Product product)
     {
-        throw new NotImplementedException();
+        var entity = _context.Products.Update(product);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 }

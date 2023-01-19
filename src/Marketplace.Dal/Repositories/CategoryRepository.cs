@@ -1,31 +1,49 @@
+using Marketplace.Dal.Data;
 using Marketplace.Domain.Entities.TableModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace Marketplace.Dal.Repositories;
 
 public class CategoryRepository : ICategoryRepository
 {
-    public Task<Category> AddAsync(Category category)
+    private readonly MarketplaceDbContext _context;
+
+    public CategoryRepository(MarketplaceDbContext context)
     {
-        throw new NotImplementedException();
+        _context = context;
+    }
+    public async Task<Category> AddAsync(Category category)
+    {
+        var entity = await _context.Categories.AddAsync(category);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<IEnumerable<Category>> GetAllAsync()
+    public async Task<IEnumerable<Category>> GetAllAsync()
     {
-        throw new NotImplementedException();
+        return await _context.Categories.ToListAsync();
     }
 
-    public Task<Category> GetAsync(long id)
+    public async Task<Category> GetAsync(long id)
     {
-        throw new NotImplementedException();
+        return await _context.Categories.FirstOrDefaultAsync(b => b.Id == id);
     }
 
-    public Task<Category> RemoveAsync(long id)
+    public async Task<Category> RemoveAsync(long id)
     {
-        throw new NotImplementedException();
+        var category = await GetAsync(id);
+        var entity = _context.Categories.Remove(category);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 
-    public Task<Category> UpdateAsync(Category category)
+    public async Task<Category> UpdateAsync(Category category)
     {
-        throw new NotImplementedException();
+        var entity = _context.Categories.Update(category);
+        await _context.SaveChangesAsync();
+
+        return entity.Entity;
     }
 }

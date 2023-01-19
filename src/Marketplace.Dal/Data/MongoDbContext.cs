@@ -8,10 +8,10 @@ public class MongoDbContext
 {
     public MongoDbContext(IConfiguration configuration)
     {
-        var client = new MongoClient("");
-        var database = client.GetDatabase("");
+        var client = new MongoClient(configuration.GetConnectionString("MongoDbConnection"));
+        var database = client.GetDatabase(configuration.GetSection("MongoDbSettings:DatabaseName").Value);
 
-        Products = database.GetCollection<ProductVariation>("");
+        Products = database.GetCollection<ProductVariation>(configuration.GetSection("MongoDbSettings:ProductsCollectionName").Value);
     }
     public IMongoCollection<ProductVariation> Products { get; }
 }
