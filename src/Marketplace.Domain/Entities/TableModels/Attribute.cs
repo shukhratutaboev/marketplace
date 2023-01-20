@@ -16,4 +16,10 @@ public class Attribute
     public bool IsHaveValues { get; set; }
 
     public List<string> Values { get; set; }
+
+    public long CategoryId { get; set; }
+
+    [ForeignKey(nameof(CategoryId))]
+    public Category Category { get; set; }
+    
 }

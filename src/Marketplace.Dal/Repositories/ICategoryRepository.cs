@@ -9,4 +9,5 @@ public interface ICategoryRepository
     Task<Category> RemoveAsync(long id);
     Task<IEnumerable<Category>> GetAllAsync();
     Task<Category> UpdateAsync(Category category);
+    Task<IEnumerable<long>> GetAllChildCategoriesAsync(long id);
 }

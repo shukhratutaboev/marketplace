@@ -13,7 +13,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Marketplace.Dal.Data.Migrations
 {
     [DbContext(typeof(MarketplaceDbContext))]
-    [Migration("20230119140212_InitialCreate")]
+    [Migration("20230120054347_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -49,6 +49,9 @@ namespace Marketplace.Dal.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("CategoryId")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsFiltered")
                         .HasColumnType("boolean");
 
@@ -62,6 +65,8 @@ namespace Marketplace.Dal.Data.Migrations
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
 
                     b.ToTable("attribute");
                 });
@@ -93,7 +98,7 @@ namespace Marketplace.Dal.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<bool>("IsSubCategory")
+                    b.Property<bool>("IsLeafCategory")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
@@ -117,6 +122,9 @@ namespace Marketplace.Dal.Data.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long>("BrandId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("CategoryId")
                         .HasColumnType("bigint");
 
@@ -124,6 +132,8 @@ namespace Marketplace.Dal.Data.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BrandId");
 
                     b.HasIndex("CategoryId");
 
@@ -145,6 +155,17 @@ namespace Marketplace.Dal.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Marketplace.Domain.Entities.TableModels.Attribute", b =>
+                {
+                    b.HasOne("Marketplace.Domain.Entities.TableModels.Category", "Category")
+                        .WithMany("Attributes")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+                });
+
             modelBuilder.Entity("Marketplace.Domain.Entities.TableModels.Category", b =>
                 {
                     b.HasOne("Marketplace.Domain.Entities.TableModels.Category", "Parent")
@@ -156,17 +177,27 @@ namespace Marketplace.Dal.Data.Migrations
 
             modelBuilder.Entity("Marketplace.Domain.Entities.TableModels.Product", b =>
                 {
+                    b.HasOne("Marketplace.Domain.Entities.TableModels.Brand", "Brand")
+                        .WithMany()
+                        .HasForeignKey("BrandId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Marketplace.Domain.Entities.TableModels.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Brand");
+
                     b.Navigation("Category");
                 });
 
             modelBuilder.Entity("Marketplace.Domain.Entities.TableModels.Category", b =>
                 {
+                    b.Navigation("Attributes");
+
                     b.Navigation("SubCategories");
                 });
 #pragma warning restore 612, 618

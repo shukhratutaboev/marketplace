@@ -46,4 +46,33 @@ public class CategoryRepository : ICategoryRepository
 
         return entity.Entity;
     }
+
+    public async Task<IEnumerable<long>> GetAllChildCategoriesAsync(long id)
+    {
+        var category = await _context.Categories.Include(c => c.SubCategories).FirstOrDefaultAsync(c => c.Id == id);
+        return await GetAllChildCategoriesAsync(category);
+    }
+
+    private async Task<IEnumerable<long>> GetAllChildCategoriesAsync(Category category)
+    {
+        var childCategories = new List<long>();
+
+        if (category == null)
+        {
+            return childCategories;
+        }
+
+        if (category.IsLeafCategory)
+        {
+            childCategories.Add(category.Id);
+            return childCategories;
+        }
+
+        foreach (var subCategory in category.SubCategories)
+        {
+            childCategories.AddRange(await GetAllChildCategoriesAsync(subCategory));
+        }
+
+        return childCategories;
+    }
 }

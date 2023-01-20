@@ -13,22 +13,6 @@ namespace Marketplace.Dal.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "attribute",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    IsFiltered = table.Column<bool>(type: "boolean", nullable: false),
-                    IsHaveValues = table.Column<bool>(type: "boolean", nullable: false),
-                    Values = table.Column<List<string>>(type: "text[]", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_attribute", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "brand",
                 columns: table => new
                 {
@@ -50,7 +34,7 @@ namespace Marketplace.Dal.Data.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
                     ParentId = table.Column<long>(type: "bigint", nullable: true),
-                    IsSubCategory = table.Column<bool>(type: "boolean", nullable: false)
+                    IsLeafCategory = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,6 +44,29 @@ namespace Marketplace.Dal.Data.Migrations
                         column: x => x.ParentId,
                         principalTable: "category",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "attribute",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: true),
+                    IsFiltered = table.Column<bool>(type: "boolean", nullable: false),
+                    IsHaveValues = table.Column<bool>(type: "boolean", nullable: false),
+                    Values = table.Column<List<string>>(type: "text[]", nullable: true),
+                    CategoryId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_attribute", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_attribute_category_CategoryId",
+                        column: x => x.CategoryId,
+                        principalTable: "category",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -93,11 +100,18 @@ namespace Marketplace.Dal.Data.Migrations
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: true),
-                    CategoryId = table.Column<long>(type: "bigint", nullable: false)
+                    CategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    BrandId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_products_brand_BrandId",
+                        column: x => x.BrandId,
+                        principalTable: "brand",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_products_category_CategoryId",
                         column: x => x.CategoryId,
@@ -105,6 +119,11 @@ namespace Marketplace.Dal.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_attribute_CategoryId",
+                table: "attribute",
+                column: "CategoryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_BrandCategory_CategoriesId",
@@ -115,6 +134,11 @@ namespace Marketplace.Dal.Data.Migrations
                 name: "IX_category_ParentId",
                 table: "category",
                 column: "ParentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_products_BrandId",
+                table: "products",
+                column: "BrandId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_products_CategoryId",

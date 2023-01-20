@@ -13,7 +13,7 @@ public class Category
 
     public long? ParentId { get; set; }
 
-    public bool IsSubCategory { get; set; }
+    public bool IsLeafCategory { get; set; }
 
     [ForeignKey(nameof(ParentId))]
     public Category Parent { get; set; }
@@ -21,5 +21,7 @@ public class Category
     public ICollection<Category> SubCategories { get; set; }
 
     public ICollection<Brand> Brands { get; set; }
+
+    public ICollection<Attribute> Attributes { get; set; }
 
 }

@@ -9,7 +9,7 @@ public class ProductVariation
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
 
-    public long PoductId { get; set; }
+    public long ProductId { get; set; }
 
     public long CategoryId { get; set; }
 

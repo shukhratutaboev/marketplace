@@ -12,6 +12,11 @@ public class Product
     public string Name { get; set; }
     
     public long CategoryId { get; set; }
+
+    public long BrandId { get; set; }
+
+    [ForeignKey(nameof(BrandId))]
+    public Brand Brand { get; set; }
     
     [ForeignKey(nameof(CategoryId))]
     public Category Category { get; set; }

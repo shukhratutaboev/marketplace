@@ -20,6 +20,12 @@ public class AttributeRepository : IAttributeRepository
         return entity.Entity;
     }
 
+    public async Task AddRangeAsync(IEnumerable<Attribute> attributes)
+    {
+        await _context.Attributes.AddRangeAsync(attributes);
+        await _context.SaveChangesAsync();
+    }
+
     public async Task<IEnumerable<Attribute>> GetAllAsync()
     {
         return await _context.Attributes.ToListAsync();
@@ -28,6 +34,11 @@ public class AttributeRepository : IAttributeRepository
     public async Task<Attribute> GetAsync(long id)
     {
         return await _context.Attributes.FirstOrDefaultAsync(a => a.Id == id);
+    }
+
+    public async Task<IEnumerable<Attribute>> GetCategoryAttributesAsync(long categoryId)
+    {
+        return await _context.Attributes.Where(a => a.CategoryId == categoryId).ToListAsync();
     }
 
     public async Task<Attribute> RemoveAsync(long id)
